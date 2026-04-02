@@ -5,16 +5,13 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-// Railway provides the PORT environment variable automatically
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-
-// DELETE THIS AFTER
 app.use(cors({
-  origin: "*",
+  origin: "https://quantamshade0337.github.io",
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
+
 }));
 
 app.use(express.json());
