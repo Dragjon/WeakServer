@@ -16,7 +16,7 @@ app.use(cors({
 
 app.use(express.json());
 
-const ENGINE_PATH = path.join(__dirname, "binaries", "weak-1.0.0-linux_v4");
+const ENGINE_PATH = path.join(__dirname, "binaries", "weak-1.0.0-linux_v3");
 
 try {
   if (fs.existsSync(ENGINE_PATH)) {
