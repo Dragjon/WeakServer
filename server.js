@@ -27,7 +27,14 @@ try {
 }
 
 app.post("/move", (req, res) => {
-  const { startfen, ucimoves = [] } = req.body;
+  const { 
+    startfen, 
+    ucimoves = [], 
+    wtime = 10000, 
+    btime = 10000, 
+    winc = 1000, 
+    binc = 1000 
+  } = req.body;
 
   if (!startfen) {
     return res.status(400).json({ error: "Missing startfen" });
@@ -35,27 +42,23 @@ app.post("/move", (req, res) => {
 
   const engine = spawn(ENGINE_PATH);
   
-  // Prevent EPIPE crashes if the binary fails to start
   engine.stdin.on('error', (err) => {
     console.error('Engine stdin error:', err.message);
   });
 
   let output = "";
-  let latestScore = 0; // Default score
+  let latestScore = 0; 
   let bestMoveFound = false;
 
   engine.stdout.on("data", (data) => {
     const text = data.toString();
     output += text;
 
-    // 1. Search for score cp in the "info" lines
-    // This regex looks for "score cp" followed by a number (positive or negative)
     const scoreMatch = text.match(/score cp (-?\d+)/);
     if (scoreMatch) {
       latestScore = parseInt(scoreMatch[1]);
     }
 
-    // 2. Search for the best move
     const moveMatch = text.match(/bestmove\s(\S+)/);
     if (moveMatch && !bestMoveFound) {
       bestMoveFound = true;
@@ -66,7 +69,7 @@ app.post("/move", (req, res) => {
 
       return res.json({
         bestmove: bestMove,
-        score: latestScore, // Added to JSON response
+        score: latestScore,
         raw: output
       });
     }
@@ -95,7 +98,7 @@ app.post("/move", (req, res) => {
     engine.stdin.write(`position fen ${startfen}${movesString}\n`);
   }
 
-  engine.stdin.write("go wtime 10000 btime 10000 winc 1000 binc 1000\n");
+  engine.stdin.write(`go wtime ${wtime} btime ${btime} winc ${winc} binc ${binc}\n`);
 });
 
 app.listen(PORT, "0.0.0.0", () => {
